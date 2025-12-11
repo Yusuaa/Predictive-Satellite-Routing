@@ -16,11 +16,13 @@ An implementation of the **Route Failure Prediction (RFP)** protocol for OSPF in
 
 ## 📊 Performance Results
 
-| Metric | Standard OSPF | SATNET-OSPF RFP | Improvement |
-|--------|---------------|-----------------|-------------|
-| Route Outage | ~40s | <10ms | **4000x faster** |
-| Detection Time | 40s (Dead interval) | Predicted | **Instant** |
-| Packet Loss | 15+ packets | 0 packets | **Zero loss** |
+| Metric | Standard OSPF (Default) | SATNET-OSPF RFP |
+|--------|-------------------------|-----------------|
+| Route Outage | ~40s (Dead Interval) | <10ms (Predicted) |
+| Detection Time | 40s | 0s (Proactive) |
+| Packet Loss | High (during outage) | Near-zero |
+
+> **Note**: Results based on ns-3 simulation. Standard OSPF performance assumes default `RouterDeadInterval` of 40s. RFP achieves near-zero outage by updating routes *before* physical link failure.
 
 ## 🚀 Quick Start
 
@@ -129,13 +131,6 @@ T1 (3s before failure)    T2 (0.5s before)    T0 (failure)    T3 (0.5s after)
    Start BFU              End BFU            (no impact!)      Resume normal
    OSPF sees DOWN         Routes ready       Traffic OK        detection
 ```
-
-### Key Components
-
-1. **Topology Management Module (TMM)**: Predicts link failures using orbital mechanics
-2. **Link Detection Module (LDM)**: Manages BLD periods, masks failures from OSPF
-3. **Route Management Module (RMM)**: Coordinates BFU, ensures synchronized updates
-4. **Quagga Integration**: Real vtysh commands to zebra/ospfd daemons
 
 ## 🐛 Troubleshooting
 
