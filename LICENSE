@@ -1,0 +1,38 @@
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+
+Copyright (C) 2024 Satellite LEO RFP Project Contributors
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+================================================================================
+
+The Satellite LEO RFP project implements Low Earth Orbit satellite constellation
+routing with predictive failure prevention mechanisms. This work is based on
+research in LEO satellite networking and OSPF routing protocol enhancements.
+
+Third-party dependencies used in this project are subject to their respective
+licenses:
+
+- NS-3 Network Simulator: GNU GPL v2+ (https://www.nsnam.org/)
+- NS-3 DCE Module: GNU GPL v2+
+- Quagga Routing Suite: GNU GPL v2+ (http://www.nongnu.org/quagga/)
+
+For complete license information of dependencies, please refer to their
+respective documentation.
+
+Contact Information:
+- Project Repository: https://github.com/your-username/satellite-leo-rfp
+- Documentation: https://github.com/your-username/satellite-leo-rfp/wiki
+- Issues: https://github.com/your-username/satellite-leo-rfp/issues

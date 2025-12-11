@@ -1,0 +1,235 @@
+# SATNET RFP Project - Git Ignore File
+
+# Compiled Object files
+*.o
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# NS-3 specific files
+*.pyc
+*.pyo
+__pycache__/
+
+# NS-3 build files
+build/
+.lock-ns3*
+.waf*
+.waf3*
+
+# NS-3 output files
+*.tr
+*.pcap
+*.xml
+*.dat
+*.log
+*.txt
+!CMakeLists.txt
+
+# NetAnim files
+*.xml
+netanim-*
+
+# Quagga configuration and log files
+*.conf
+zebra.log
+ospfd.log
+bgpd.log
+ripd.log
+
+# DCE specific files
+dce-*
+files-*
+
+# Simulation output
+results/
+output/
+traces/
+animations/
+*.csv
+*.json
+performance-*.txt
+
+# Backup files
+*~
+*.bak
+*.backup
+*.swp
+*.swo
+*.orig
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-*
+.eclipse/
+.project
+.cproject
+*.kate-swp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment files (except template)
+.env
+.env.local
+.env.production
+scripts/env-setup.sh
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Documentation build files
+docs/build/
+docs/_build/
+docs/html/
+docs/latex/
+site/
+
+# Dependencies
+node_modules/
+bower_components/
+
+# Package files
+*.tar.gz
+*.zip
+*.7z
+
+# Log files
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Memory dumps
+*.hprof
+
+# Build artifacts
+bin/
+obj/
+dist/
+target/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Autotools
+/autom4te.cache
+/config.guess
+/config.sub
+/configure
+/depcomp
+/install-sh
+/missing
+/mkinstalldirs
+/config.log
+/config.status
+/Makefile.in
+/aclocal.m4
+
+# Custom simulation configurations
+custom-config.h
+local-settings.h
+
+# Performance analysis files
+callgrind.out.*
+massif.out.*
+heaptrack.*
+
+# Core dumps
+core
+core.*
+
+# Valgrind output
+vgcore.*
+
+# GDB history
+.gdb_history
+
+# Profiling data
+gmon.out
+
+# Address Sanitizer
+*.asan
+
+# Thread Sanitizer
+*.tsan
+
+# Memory Sanitizer
+*.msan
+
+# UBSan
+*.ubsan
+
+# Clang static analyzer
+scan-build-*
+
+# Static analysis
+cppcheck-*
+*.sarif
+
+# Documentation files that shouldn't be tracked
+TAGS
+.tags
+tags
+
+# User-specific configuration
+user-config.yaml
+user-config.json
+local-config.*
+!src/core/constellation-params.h
+!src/core/constellation.h!src/core/constellation-params.h
+!src/core/constellation.h
