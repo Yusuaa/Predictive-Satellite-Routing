@@ -6,6 +6,10 @@
 
 An implementation of the **Route Failure Prediction (RFP)** protocol for OSPF in Low Earth Orbit (LEO) satellite constellations. This project extends OSPF with predictive link management to achieve near-zero packet loss during satellite handovers.
 
+<p align="center">
+  <img src="assets/satnet_demo.gif" alt="SATNET-OSPF Demo" width="700">
+</p>
+
 ## 🎯 Key Features
 
 - **Predictive Link Detection**: Uses orbital mechanics to predict link failures 3+ seconds in advance
@@ -72,8 +76,6 @@ Simulation completed successfully!
 ```
 
 ## 🎬 Visualization with NetAnim
-
-![SATNET-OSPF Demo](assets/satnet_demo.gif)
 
 The simulation automatically generates an XML trace file for visualization.
 
