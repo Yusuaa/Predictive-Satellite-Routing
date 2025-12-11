@@ -73,6 +73,8 @@ Simulation completed successfully!
 
 ## 🎬 Visualization with NetAnim
 
+![SATNET-OSPF Demo](assets/satnet_demo.gif)
+
 The simulation automatically generates an XML trace file for visualization.
 
 ### 1. File Location
