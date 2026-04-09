@@ -190,8 +190,9 @@ massif.out.*
 heaptrack.*
 
 # Core dumps
-core
+/core
 core.*
+!src/core/
 
 # Valgrind output
 vgcore.*
