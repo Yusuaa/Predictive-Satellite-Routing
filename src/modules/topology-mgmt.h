@@ -79,7 +79,7 @@ public:
         for (const auto& event : m_predictedEvents) {
             if (event.active && 
                 ((event.nodeA == nodeA && event.nodeB == nodeB) ||
-                 (event.nodeA == nodeB && event.nodeA == nodeA)) &&
+                 (event.nodeA == nodeB && event.nodeB == nodeA)) &&
                 currentTime >= event.T1 && currentTime <= event.T3) {
                 return true;
             }
