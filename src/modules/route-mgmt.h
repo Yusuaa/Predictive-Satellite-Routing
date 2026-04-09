@@ -16,20 +16,21 @@ using namespace ns3;
  */
 class RouteManagementModule {
 private:
-    bool m_bfuActive;                                 // Is BFU period active?
+    uint32_t m_bfuRefCount;                            // BFU active when > 0 (handles overlapping events)
     std::vector<std::pair<Ptr<Node>, std::string>> m_pendingUpdates;  // Pending updates
     uint32_t m_routeUpdatesBlocked;                   // Counter for blocked updates
     uint32_t m_routeUpdatesApplied;                   // Counter for applied updates
-    
+
 public:
-    RouteManagementModule() : m_bfuActive(false), m_routeUpdatesBlocked(0), m_routeUpdatesApplied(0) {}
+    RouteManagementModule() : m_bfuRefCount(0), m_routeUpdatesBlocked(0), m_routeUpdatesApplied(0) {}
     
     /**
      * Starts the BFU period - delays application of new routes (T1)
      */
     void StartBfuPeriod(double currentTime) {
-        m_bfuActive = true;
-        std::cout << "⏸️ RMM: Started BFU period at t=" << currentTime << "s" << std::endl;
+        m_bfuRefCount++;
+        std::cout << "⏸️ RMM: Started BFU period at t=" << currentTime << "s"
+                  << " (active events: " << m_bfuRefCount << ")" << std::endl;
         std::cout << "   → Route updates will be delayed until synchronization point" << std::endl;
     }
     
@@ -37,12 +38,22 @@ public:
      * Ends the BFU period - applies all pending routes SYNCHRONOUSLY (T2)
      */
     void EndBfuPeriod(double currentTime) {
-        m_bfuActive = false;
-        
-        std::cout << "🔄 RMM: Ended BFU period at t=" << currentTime << "s" << std::endl;
-        std::cout << "   → Applying " << m_pendingUpdates.size() 
+        if (m_bfuRefCount > 0) {
+            m_bfuRefCount--;
+        }
+
+        std::cout << "🔄 RMM: BFU event ended at t=" << currentTime << "s"
+                  << " (remaining active events: " << m_bfuRefCount << ")" << std::endl;
+
+        // Only flush pending updates when ALL overlapping BFU periods have ended
+        if (m_bfuRefCount > 0) {
+            std::cout << "   → BFU still active (overlapping events), updates remain buffered" << std::endl;
+            return;
+        }
+
+        std::cout << "   → Applying " << m_pendingUpdates.size()
                   << " pending route updates SYNCHRONOUSLY" << std::endl;
-        
+
         try {
             // Apply all pending updates
             for (const auto& update : m_pendingUpdates) {
@@ -50,13 +61,13 @@ public:
                 m_routeUpdatesApplied++;
             }
             m_pendingUpdates.clear();
-            
+
             // Find alternative paths via other nodes (limited to avoid errors)
             ForceOspfConvergence();
-            
+
             std::cout << "RMM: All forwarding tables updated synchronously" << std::endl;
             std::cout << "   → " << m_routeUpdatesApplied << " route updates applied" << std::endl;
-            
+
         } catch (const std::exception& e) {
             std::cerr << "Error ending BFU period: " << e.what() << std::endl;
             std::cerr << "BFU period ended in simulation mode" << std::endl;
@@ -66,7 +77,7 @@ public:
 
     void OnNewRoutingTable(Ptr<Node> node, const std::string& routeUpdate, double currentTime) {
         try {
-            if (m_bfuActive) {
+            if (m_bfuRefCount > 0) {
                 m_pendingUpdates.push_back(std::make_pair(node, routeUpdate));
                 m_routeUpdatesBlocked++;
                 // std::cout << "RMM: Route update DELAYED (BFU active) - " 
@@ -85,7 +96,7 @@ public:
     
     uint32_t GetBlockedUpdatesCount() const { return m_routeUpdatesBlocked; }
     uint32_t GetAppliedUpdatesCount() const { return m_routeUpdatesApplied; }
-    bool IsBfuActive() const { return m_bfuActive; }
+    bool IsBfuActive() const { return m_bfuRefCount > 0; }
     
 private:
     /**

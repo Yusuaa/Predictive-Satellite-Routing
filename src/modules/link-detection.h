@@ -19,7 +19,7 @@ class LinkDetectionModule {
 private:
     std::map<std::pair<int, int>, bool> m_realLinkStates;      // Real link states
     std::map<std::pair<int, int>, bool> m_reportedLinkStates;  // Link states reported to OSPF
-    std::set<std::pair<int, int>> m_forcedDownLinks;           // Links forced DOWN by RFP
+    std::map<std::pair<int, int>, uint32_t> m_forcedDownRefCount;  // BLD ref count per link (handles overlapping events)
     
     std::pair<int, int> MakeOrderedPair(int nodeA, int nodeB) {
         return std::make_pair(std::min(nodeA, nodeB), std::max(nodeA, nodeB));
@@ -31,19 +31,21 @@ public:
      */
     void ForceLinkDown(int nodeA, int nodeB, double currentTime) {
         std::pair<int, int> link = MakeOrderedPair(nodeA, nodeB);
-        m_forcedDownLinks.insert(link);
+        m_forcedDownRefCount[link]++;
         m_reportedLinkStates[link] = false;
-        
-        std::cout << "LDM: Forcing link " << nodeA << "<->" << nodeB 
-                  << " DOWN in OSPF at t=" << currentTime << "s" << std::endl;
+
+        std::cout << "LDM: Forcing link " << nodeA << "<->" << nodeB
+                  << " DOWN in OSPF at t=" << currentTime << "s"
+                  << " (BLD ref count: " << m_forcedDownRefCount[link] << ")" << std::endl;
         std::cout << "   → OSPF will recalculate routes to avoid this link" << std::endl;
-        
+
         try {
-            // REAL modification in Quagga
-            SetQuaggaLinkStateReal(nodeA, nodeB, false);
-            
-            AddAlternativeRoutes(nodeA, nodeB);
-            
+            // REAL modification in Quagga (only on first force-down)
+            if (m_forcedDownRefCount[link] == 1) {
+                SetQuaggaLinkStateReal(nodeA, nodeB, false);
+                AddAlternativeRoutes(nodeA, nodeB);
+            }
+
         } catch (const std::exception& e) {
             std::cerr << "Error forcing link down: " << e.what() << std::endl;
             std::cerr << "🔧 Link down appliqué en mode simulation" << std::endl;
@@ -55,21 +57,34 @@ public:
      */
     void RestoreNormalDetection(int nodeA, int nodeB, double currentTime) {
         std::pair<int, int> link = MakeOrderedPair(nodeA, nodeB);
-        m_forcedDownLinks.erase(link);
-        
+
+        if (m_forcedDownRefCount.count(link) && m_forcedDownRefCount[link] > 0) {
+            m_forcedDownRefCount[link]--;
+        }
+
+        // Only restore when ALL overlapping BLD periods for this link have ended
+        if (m_forcedDownRefCount[link] > 0) {
+            std::cout << "LDM: BLD event ended for link " << nodeA << "<->" << nodeB
+                      << " at t=" << currentTime << "s, but BLD still active"
+                      << " (remaining: " << m_forcedDownRefCount[link] << ")" << std::endl;
+            return;
+        }
+
+        m_forcedDownRefCount.erase(link);
+
         bool realState = m_realLinkStates[link];
         m_reportedLinkStates[link] = realState;
-        
+
         try {
             // REAL modification in Quagga
             SetQuaggaLinkStateReal(nodeA, nodeB, realState);
-            
+
         } catch (const std::exception& e) {
             std::cerr << "Error restoring detection: " << e.what() << std::endl;
             std::cerr << "🔧 Restore detection appliqué en mode simulation" << std::endl;
         }
-        
-        std::cout << "LDM: Restored normal detection for link " << nodeA << "<->" << nodeB 
+
+        std::cout << "LDM: Restored normal detection for link " << nodeA << "<->" << nodeB
                   << " at t=" << currentTime << "s (real state: " << (realState ? "UP" : "DOWN") << ")" << std::endl;
     }
     
@@ -79,7 +94,7 @@ public:
         bool oldState = m_realLinkStates[link];
         m_realLinkStates[link] = isUp;
         
-        if (m_forcedDownLinks.find(link) != m_forcedDownLinks.end()) {
+        if (m_forcedDownRefCount.count(link) && m_forcedDownRefCount[link] > 0) {
             // std::cout << "LDM: Link " << nodeA << "<->" << nodeB << " state change IGNORED"
             //           << " (real=" << (isUp ? "UP" : "DOWN") << ", forced DOWN by RFP)" << std::endl;
             return;
